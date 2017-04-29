@@ -1,3 +1,11 @@
+//init default map
+var map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 13,
+    center: new google.maps.LatLng(6.80448, -58.15527),
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+});
+
+// set up each point on the map
 function point(name, lat, long, custInfo) {
     this.name = name;
     this.lat = ko.observable(lat);
@@ -52,13 +60,9 @@ function toggleBounce(marker) {
 }
 
 
-var map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 13,
-    center: new google.maps.LatLng(6.80448, -58.15527),
-    mapTypeId: google.maps.MapTypeId.ROADMAP
-});
 
 var viewModel = {
+    // onload default points
     points: ko.observableArray([
         new point('Park', 6.8214123, -58.1515635, 'good for a run'),
         new point('Seawall Band Stand', 6.82515163463196, -58.15879497783209, 'if you like salt water'),
