@@ -1,9 +1,18 @@
-//init default map
+//set default lat long / on load lat / longs
+this.defLat = ko.observable(6.80448);
+this.defLong = ko.observable(-58.15527);
+
+//init map
 var map = new google.maps.Map(document.getElementById('map'), {
     zoom: 13,
-    center: new google.maps.LatLng(6.80448, -58.15527),
+    center: new google.maps.LatLng(this.defLat(), this.defLong()),
     mapTypeId: google.maps.MapTypeId.ROADMAP
 });
+// search filter search box
+var autoSearch = new google.maps.places.Autocomplete(
+    document.getElementById('autoSearch')
+);
+
 
 // set up each point on the map
 function point(name, lat, long, custInfo) {
@@ -60,15 +69,39 @@ function toggleBounce(marker) {
 }
 
 
+// zoom to selected area 
+zoomToArea = function () {
+    var geocoder = new google.maps.Geocoder();
+    var address = viewModel.autoAddress();
+    geocoder.geocode({
+        address: address,
+        componentRestrictions: {
+            locality: 'Georgetown Guyana'
+        }
+    }, function (results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+            map.setCenter(results[0].geometry.location);
+            map.setZoom(15);
+        } else {
+            window.alert('We could not find that location - try entering a more' +
+                ' specific place.');
+        }
+    });
+}
+
+
+
 
 var viewModel = {
+    autoAddress: ko.observable(),
     // onload default points
     points: ko.observableArray([
         new point('Park', 6.8214123, -58.1515635, 'good for a run'),
         new point('Seawall Band Stand', 6.82515163463196, -58.15879497783209, 'if you like salt water'),
         new point('Botanical Gardens', 6.806412798079851, -58.145383690429696, 'nice for walk'),
         new point('Guyana Defence Force', 6.82217930736949, -58.14581284387208, 'army base')
-    ])
+    ]),
+
 };
 
 ko.applyBindings(viewModel);
