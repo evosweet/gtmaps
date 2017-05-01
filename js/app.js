@@ -1,18 +1,23 @@
-//set default lat long / on load lat / longs
-this.defLat = ko.observable(6.80448);
-this.defLong = ko.observable(-58.15527);
-
 //init map
 var map = new google.maps.Map(document.getElementById('map'), {
     zoom: 13,
-    center: new google.maps.LatLng(this.defLat(), this.defLong()),
+    center: new google.maps.LatLng(6.80448, -58.15527),
     mapTypeId: google.maps.MapTypeId.ROADMAP
 });
 // search filter search box
-var autoSearch = new google.maps.places.Autocomplete(
+var autoSearch = new google.maps.places.SearchBox(
     document.getElementById('autoSearch')
 );
+autoSearch.setBounds(map.getBounds());
 
+// places markers
+var placesMarkers = [];
+
+function hideMarkers(markers){
+    for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(null);
+    }
+}
 
 // set up each point on the map
 function point(name, lat, long, custInfo) {
@@ -68,32 +73,94 @@ function toggleBounce(marker) {
     }
 }
 
+autoSearch.addListener('places_changed',function(){
+    searchBoxPlaces(this);
+});
+
+ function searchBoxPlaces(placeMarker){
+     hideMarkers(placeMarker);
+     var places = autoSearch.getPlaces();
+     createMakersForPlaces(places);
+ }
+
 
 // zoom to selected area 
 zoomToArea = function () {
-    var geocoder = new google.maps.Geocoder();
-    var address = viewModel.autoAddress();
-    geocoder.geocode({
-        address: address,
-        componentRestrictions: {
-            locality: 'Georgetown Guyana'
-        }
-    }, function (results, status) {
-        if (status == google.maps.GeocoderStatus.OK) {
-            map.setCenter(results[0].geometry.location);
-            map.setZoom(15);
-        } else {
-            window.alert('We could not find that location - try entering a more' +
-                ' specific place.');
-        }
-    });
+   var bounds = map.getBounds();
+   hideMarkers(placesMarkers);
+   var placesService = new google.maps.places.PlacesService(map);
+   placesService.textSearch({
+       query:document.getElementById('autoSearch').value,
+       bounds: bounds}, function(results, status){
+           createMakersForPlaces(results);
+       });
 }
 
+ function createMakersForPlaces(places){
+     var bounds = new google.maps.LatLngBounds();
+     for (var i = 0; i < places.length; i++) {
+       var place = places[i];
+       var icon = {
+           url: place.icon,
+           size: new google.maps.Size(35,35),
+           origin: new google.maps.Point(0,0),
+           anchor: new google.maps.Point(15,34),
+           scaledSize: new google.maps.Size(25,25)
+       };
+      //create icon
+      var marker = new google.maps.Marker({
+        map: map,
+        icon: icon,
+        title:place.name,
+        position: place.geometry.location,
+        id: place.place_id
+      });
+      // create info window
+      var placesInfoWindow = new google.maps.InfoWindow()
+      // add event tp marker
+      marker.addListener('click', function(){
+        if(placesInfoWindow.marker == this){
+            console.log("this infowindow already is on this ,marker");
+        }else{
+            getPlacesDetails(this, placesInfoWindow);
+        }
+      });
+      //push marker data
+      placesMarkers.push(marker);
+      if(place.geometry.viewport){
+          bounds.union(place.geometry.viewport);
+      }else{
+          bounds.extend(places.geometry.location);
+      }
+     }
+     map.fitBounds(bounds);
+ }
 
+ function getPlacesDetails(marker,infowindow){
+     var service = new google.maps.places.PlacesService(map);
+     console.log(marker.id);
+     service.getDetails({
+        placeId: marker.id
+     }, function(place, status){
+         if (status === google.maps.places.PlacesServiceStatus.OK){
+             infowindow.marker = marker;
+             var innerHTML = '<div>';
+             if(place.name){
+                 innerHTML += '<strong>'+ place.name +'</strong>';
+             }
+             innerHTML += '</div>';
+             infowindow.setContent(innerHTML);
+             infowindow.open(map,marker);
+             console.log("this is going yo take a while");
+         }else{
+             console.log("this is a test for no name");
+         }
+     });
+ }
 
 
 var viewModel = {
-    autoAddress: ko.observable(),
+    //autoAddress: ko.observable(),
     // onload default points
     points: ko.observableArray([
         new point('Park', 6.8214123, -58.1515635, 'good for a run'),
