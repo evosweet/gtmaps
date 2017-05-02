@@ -1,9 +1,10 @@
 //init
 $(document).ready(function () {
-    var self = this;
 
     function viewModel() {
-        var placesMarkers = ko.observableArray([]);
+        var self = this;
+
+        self.placesMarkers = ko.observableArray([]);
         //init map
         var map = new google.maps.Map(document.getElementById('map'), {
             zoom: 13,
@@ -16,7 +17,7 @@ $(document).ready(function () {
         var placesService = new google.maps.places.PlacesService(map);
         // make first default search call
         placesService.textSearch({
-            query: 'Guyana Food',
+            query: 'Georgetown Guyana Food',
             bounds: bounds
         }, function (results, status) {
             createMakersForPlaces(results);
@@ -52,7 +53,7 @@ $(document).ready(function () {
                     }
                 });
                 //push marker data
-                placesMarkers.push(marker);
+                self.placesMarkers.push(marker);
                 if (place.geometry.viewport) {
                     bounds.union(place.geometry.viewport);
                 } else {
@@ -61,7 +62,11 @@ $(document).ready(function () {
             }
             map.fitBounds(bounds);
         }
+        console.log(self.placesMarkers());
         //end
+        self.setLocation = function(data){
+            console.log(data);
+        }
     }
     ko.applyBindings(new viewModel());
 });
