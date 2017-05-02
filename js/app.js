@@ -3,7 +3,9 @@ $(document).ready(function () {
 
     function viewModel() {
         var self = this;
-
+        //init searchBox
+        self.autoAddress = ko.observable("");
+        //init places array
         self.placesMarkers = ko.observableArray([]);
         //init map
         var map = new google.maps.Map(document.getElementById('map'), {
@@ -11,18 +13,13 @@ $(document).ready(function () {
             center: new google.maps.LatLng(6.80448, -58.15527),
             mapTypeId: google.maps.MapTypeId.ROADMAP
         });
+        var autoSearch = new google.maps.places.SearchBox(
+            document.getElementById('autoSearch')
+        );
         //get map bounds
         var bounds = map.getBounds();
         //call google places service
         var placesService = new google.maps.places.PlacesService(map);
-        // make first default search call
-        placesService.textSearch({
-            query: 'Georgetown Guyana Food',
-            bounds: bounds
-        }, function (results, status) {
-            createMakersForPlaces(results);
-        });
-        // create places markers
         function createMakersForPlaces(places) {
             var bounds = new google.maps.LatLngBounds();
             for (var i = 0; i < places.length; i++) {
@@ -62,11 +59,31 @@ $(document).ready(function () {
             }
             map.fitBounds(bounds);
         }
-        console.log(self.placesMarkers());
         //end
-        self.setLocation = function(data){
+        self.setLocation = function (data) {
             console.log(data);
+        };
+
+        function hideMarkers(markers) {
+            for (var i = 0; i < markers.length; i++) {
+                markers[i].setMap(null);
+            }
         }
+        self.newPlaces = function () {
+            if (!self.autoAddress()){
+                searchTeam = 'Georgetown Guyana Food'
+            }
+            else{
+                searchTeam = self.autoAddress();
+            }
+            placesService.textSearch({
+                query:searchTeam,
+                bounds: bounds
+            }, function (results, status) {
+                createMakersForPlaces(results);
+            });
+        }
+        self.newPlaces();
     }
     ko.applyBindings(new viewModel());
 });

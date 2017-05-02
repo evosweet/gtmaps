@@ -31,11 +31,11 @@
                         </div>
                         <!-- Collect the nav links, forms, and other content for toggling -->
                         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                            <form class="navbar-form navbar-left">
-                                <!--<div class="form-group">
-                                    <input type="text" class="form-control" data-bind="textInput: autoAddress" id="autoSearch">
-                                </div>
-                                <button type="button" class="btn btn-default" data-bind="click: zoomToArea">Filter</button>-->
+                            <form class="navbar-form navbar-left" data-bind="submit: newPlaces">
+                            <div class="form-group">
+                                <input type="text" class="form-control" data-bind="textInput: autoAddress, event:{change:newPlaces}" id="autoSearch">
+                            </div>
+                                <!--<button type="button" class="btn btn-default" data-bind="click: zoomToArea">Filter</button>-->
                            </form>
                            <ul class="nav navbar-nav">
                            <li class="dropdown">
