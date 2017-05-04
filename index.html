@@ -21,18 +21,11 @@
 
 </head>
 <body>
+
     <div id="wrapper">
         <!-- Sidebar -->
         <div id="sidebar-wrapper">
-            <ul>
-                <form class="navbar-form navbar-left" data-bind="submit: newPlaces">
-                    <div class="form-group">
-                        <input type="text" class="form-control" data-bind="textInput: autoAddress, event:{change:newPlaces}" id="autoSearch">
-                    </div>
-                </form>
-            <ul>
-            <br>
-            <ul data-bind="foreach: placesMarkers">
+            <ul data-bind="foreach: placesMarkers" class="sidebar-nav">
                 <li>
                     <a href="#" data-bind="click: $parent.setLocation, text: title"></a>
                 <li>              
@@ -44,7 +37,21 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12" id="map_wrapper">  
+                        <input type="text" class="form-control" data-bind="textInput: autoAddress, event:{change:newPlaces}" id="autoSearch">
+                        <hr>
                         <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Show List Of Places</a>
+                        <hr>
+                        <div class="alert alert-info" role="alert">
+                            Name: <span data-bind="text: placeTitle"></span>
+                            <br>
+                            Address: <span data-bind="text: placeAddress"></span>
+                            <br>
+                            Phone Number: <span data-bind="text: placePhone"></span>
+                            <br>
+                            WebSite: <a data-bind="attr: {href: placeWebsite}">
+                                <span data-bind="text:urlTitle"></span>
+                            </a>
+                        </div>
                         <hr>
                         <div id="map"></div>
                     </div>
