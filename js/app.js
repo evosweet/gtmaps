@@ -1,14 +1,17 @@
 //init
 $(document).ready(function () {
-
+    // application side-bar
+    $("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
     function viewModel() {
         var self = this;
         //init searchBox
         self.autoAddress = ko.observable("");
         //init places array
         self.placesMarkers = ko.observableArray([]);
-
-        //
+        //init on load
         self.placeTitle = ko.observable();
         self.placeAddress = ko.observable();
         self.placePhone = ko.observable();
@@ -52,15 +55,11 @@ $(document).ready(function () {
                 });
                 // create info window
                 var placesInfoWindow = new google.maps.InfoWindow();
-                // toggle marker
-                // add marker animation
-                // add event tp marker
                 marker.addListener('click', function () {
                     map.setCenter(this.getPosition());
                     getPlacesDetails(this, placesInfoWindow);
                     toggleBounce(this);
                 });
-
                 self.placesMarkers.push(marker);
                 if (place.geometry.viewport) {
                     bounds.union(place.geometry.viewport);
@@ -76,60 +75,34 @@ $(document).ready(function () {
                 marker.setAnimation(null);
             } else {
                 marker.setAnimation(google.maps.Animation.BOUNCE);
-                setTimeout(function(){ marker.setAnimation(null); }, 1000);
+                setTimeout(function () {
+                    marker.setAnimation(null);
+                }, 2000);
             }
         }
 
         //get places data
         function getPlacesDetails(marker, infowindow) {
-            var service = new google.maps.places.PlacesService(map);
             self.getDetails(marker);
-            console.log();
-            service.getDetails({
-                placeId: marker.id
-            }, function (place, status) {
-                if (status === google.maps.places.PlacesServiceStatus.OK) {
-                    infowindow.marker = marker;
-                    var innerHTML = '<div>';
-                    if (place.name) {
-                        innerHTML += '<strong>' + self.placeTitle() + '</strong>';
-                    }
-                    if (place.formatted_address) {
-                        innerHTML += '<br>' + "Full Address " + self.placeAddress();
-                    }
-                    if (place.formatted_phone_number) {
-                        innerHTML += '<br>' + "Phone Number " + self.placePhone();
-                    }
-                    if (place.website) {
-                        innerHTML += '<br>' + "Website " + place.website;
-                    }
-
-                    innerHTML += '</div>';
-                    infowindow.setContent(innerHTML);
-                    infowindow.open(map, marker);
-                } else {
-                    console.log("erorr");
-                }
-            });
         }
         //end
 
         //places services
-        self.getDetails = function(marker){
+        self.getDetails = function (marker) {
             service = new google.maps.places.PlacesService(map);
             service.getDetails({
                 placeId: marker.id
-            },function(place, status){
+            }, function (place, status) {
                 if (status === google.maps.places.PlacesServiceStatus.OK) {
-                   self.placeTitle(place.name); 
-                   self.placeAddress(place.formatted_address);
-                   self.placePhone(place.formatted_phone_number);
-                   if (place.website){
+                    self.placeTitle(place.name);
+                    self.placeAddress(place.formatted_address);
+                    self.placePhone(place.formatted_phone_number);
+                    if (place.website) {
                         self.placeWebsite(place.website);
                         self.urlTitle("Click On Me");
-                   }else{
+                    } else {
                         self.urlTitle("No Link");
-                   }
+                    }
                 }
             });
         };
