@@ -92,12 +92,12 @@ $(document).ready(function () {
         self.getFour = function(maker){
             var lat = maker.position.lat();
             var lng = maker.position.lng();
-            var fourUrl = "https://api.foursquare.com/v2/venues/explore?v=20161016&ll="+lat+","+lng+"&client_id=N3Y3RPYUKPGUJDV43KSVKKIWQGUPQHHK2WVPRM1YBYJPZFH4&client_secret=WJLN1QFWK0AG4GU125BNMLG0JOLBWW14JDDORYU5ZKB3DNXR&limit=2";
+            var fourUrl = "https://api.foursquare.com/v2/venues/explore?v=20161016&ll="+lat+","+lng+"&client_id=N3Y3RPYUKPGUJDV43KSVKKIWQGUPQHHK2WVPRM1YBYJPZFH4&client_secret=WJLN1QFWK0AG4GU125BNMLG0JOLBWW14JDDORYU5ZKB3DNXR&limit=4";
             $.getJSON(fourUrl,function(data){
                 console.log(data.response.groups[0].items);
+            }).done(function(data){
                 self.fourData(data.response.groups[0].items);
-            });
-            console.log(fourUrl);
+            }).fail(function(){alert("ERROR Accessing External API");});
         };
         //places services
         self.getDetails = function (marker) {

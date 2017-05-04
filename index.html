@@ -52,7 +52,10 @@
                             <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#fourbox">Near You</button>
                             <div id="fourbox" class="collapse">
                                 <ul data-bind="foreach: fourData" class="list-group">
-                                    <li data-bind="text: venue.name" class="list-group-item"></li>
+                                    <li class="list-group-item">
+                                        <b>Name</b>: <span data-bind="text: venue.name"></span>
+                                        <b>Rating</b>: <span data-bind="text: venue.rating"></span>
+                                    </li>
                                 </ul>
                             </div>
                             
