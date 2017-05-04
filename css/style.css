@@ -1,5 +1,6 @@
 #map_wrapper{
     height: 100%;
+    position: relative;
 }
 #map{
     padding-top: 10px;
@@ -7,3 +8,4 @@
     height:600px;
     position : absolute;
 }   
+#over_map { position: absolute; top: 105%; left: 70%; z-index: 99; }
