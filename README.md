@@ -17,8 +17,18 @@ A web Application that uses the google MAPS API to allow the user to find places
 7. Toggle button to show / hide list of places.
 
 
-#### How To Run Application
+#### Application Dependencies
 
+1. KnockoutJS
+2. Bootstrap
+3. Jquery
+4. Google MAPS API
+5. Foursquare API
+
+#### How To Run Application
+Go to the root folder after downloading/cloning the  Repository.
+`right click` the `index.html` file and select `open` run the application in your default browser.`
+External Libs are loaded through `CDN`
 
 
 
