@@ -5,7 +5,7 @@ $(document).ready(function () {
         e.preventDefault();
         $("#wrapper").toggleClass("toggled");
     });
-
+    // ko view model
     function viewModel() {
         var self = this;
         //init searchBox
@@ -13,19 +13,20 @@ $(document).ready(function () {
         //init places array
         self.placesMarkers = ko.observableArray([]);
         //init on load
-        self.placeTitle = ko.observable();
-        self.placeAddress = ko.observable();
-        self.placePhone = ko.observable();
-        self.placeWebsite = ko.observable();
-        self.urlTitle = ko.observable();
+        self.placeTitle = ko.observable("");
+        self.placeAddress = ko.observable("");
+        self.placePhone = ko.observable("");
+        self.placeWebsite = ko.observable("");
+        self.urlTitle = ko.observable("");
         self.fourData = ko.observableArray([]);
         //
-        //init map
+        //init map 
         var map = new google.maps.Map(document.getElementById("map"), {
             zoom: 13,
             center: new google.maps.LatLng(6.80448, -58.15527),
             mapTypeId: google.maps.MapTypeId.ROADMAP
         });
+        //init auto search box 
         var autoSearch = new google.maps.places.SearchBox(
             document.getElementById("autoSearch")
         );
@@ -35,10 +36,11 @@ $(document).ready(function () {
         var placesService = new google.maps.places.PlacesService(map);
 
         function createMakersForPlaces(places) {
-            //init marker array
+            // new map bounds for each marker
             bounds = new google.maps.LatLngBounds();
             // init each marker
             places.forEach(function (place) {
+                // make icon
                 icon = {
                     url: place.icon,
                     size: new google.maps.Size(35, 35),
@@ -46,6 +48,7 @@ $(document).ready(function () {
                     anchor: new google.maps.Point(15, 34),
                     scaledSize: new google.maps.Size(25, 25)
                 };
+                // place each marker on the map
                 marker = new google.maps.Marker({
                     map: map,
                     icon: icon,
@@ -54,12 +57,14 @@ $(document).ready(function () {
                     id: place.place_id,
                     animation: google.maps.Animation.DROP
                 });
+                // add click event to each marker
                 marker.addListener("click", function () {
                     map.setCenter(marker.getPosition());
                     self.getDetails(this);
                     self.toggleBounce(this);
                     self.getFour(this);
                 });
+                // add markers to array
                 self.placesMarkers.push(marker);
                 if (place.geometry.viewport) {
                     bounds.union(place.geometry.viewport);
@@ -69,7 +74,7 @@ $(document).ready(function () {
             });
             map.fitBounds(bounds);
         }
-        //end
+        // toggle marker Animation
         self.toggleBounce = function (marker) {
             if (marker.getAnimation() !== null) {
                 marker.setAnimation(null);
@@ -84,9 +89,8 @@ $(document).ready(function () {
         //get places data
         self.getPlacesDetails = function (marker) {
             self.getDetails(marker);
-        }
-        //end
-        // foursquear datd
+        };
+        // Foursquear API DATA call
         self.getFour = function (maker) {
             var lat = maker.position.lat();
             var lng = maker.position.lng();
@@ -115,10 +119,12 @@ $(document).ready(function () {
                     } else {
                         self.urlTitle("No Link");
                     }
+                }else{
+                    alert("Google API ERROR");
                 }
             });
         };
-
+        // update page when list item is clicked
         self.setLocation = function (marker) {
             self.getDetails(marker);
             self.getFour(marker);
