@@ -9,3 +9,8 @@
     position : absolute;
 }   
 #over_map { position: absolute; top: 105%; left: 70%; z-index: 99; }
+
+#fourimage{
+    height: 30px;
+    width: 200px;
+}
