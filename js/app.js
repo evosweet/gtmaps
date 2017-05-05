@@ -1,10 +1,7 @@
 //init
-$(document).ready(function () {
-    // application side-bar
-    $("#menu-toggle").click(function (e) {
-        e.preventDefault();
-        $("#wrapper").toggleClass("toggled");
-    });
+// $(document).ready(function () {
+function initMap() {
+    'use strict';
     // ko view model
     function viewModel() {
         var self = this;
@@ -19,12 +16,20 @@ $(document).ready(function () {
         self.placeWebsite = ko.observable("");
         self.urlTitle = ko.observable("");
         self.fourData = ko.observableArray([]);
-        //
+        // custom map style
+        var myStyles = [{
+            featureType: "poi",
+            elementType: "labels",
+            stylers: [{
+                visibility: "off"
+            }]
+        }];
         //init map 
         var map = new google.maps.Map(document.getElementById("map"), {
             zoom: 13,
             center: new google.maps.LatLng(6.80448, -58.15527),
-            mapTypeId: google.maps.MapTypeId.ROADMAP
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            styles: myStyles
         });
         //init auto search box 
         var autoSearch = new google.maps.places.SearchBox(
@@ -41,7 +46,7 @@ $(document).ready(function () {
             // init each marker
             places.forEach(function (place) {
                 // make icon
-                icon = {
+                var icon = {
                     url: place.icon,
                     size: new google.maps.Size(35, 35),
                     origin: new google.maps.Point(0, 0),
@@ -49,7 +54,7 @@ $(document).ready(function () {
                     scaledSize: new google.maps.Size(25, 25)
                 };
                 // place each marker on the map
-                marker = new google.maps.Marker({
+                var marker = new google.maps.Marker({
                     map: map,
                     icon: icon,
                     title: place.name,
@@ -59,7 +64,7 @@ $(document).ready(function () {
                 });
                 // add click event to each marker
                 marker.addListener("click", function () {
-                    map.setCenter(marker.getPosition());
+                    map.panTo(marker.getPosition());
                     self.getDetails(this);
                     self.toggleBounce(this);
                     self.getFour(this);
@@ -72,6 +77,10 @@ $(document).ready(function () {
                     bounds.extend(places.geometry.location);
                 }
             });
+            //
+            google.maps.event.addDomListener(window, 'resize', function () {
+                map.fitBounds(bounds);
+            });
             map.fitBounds(bounds);
         }
         // toggle marker Animation
@@ -82,9 +91,9 @@ $(document).ready(function () {
                 marker.setAnimation(google.maps.Animation.BOUNCE);
                 setTimeout(function () {
                     marker.setAnimation(null);
-                }, 2000);
+                }, 1400);
             }
-        }
+        };
 
         //get places data
         self.getPlacesDetails = function (marker) {
@@ -96,7 +105,7 @@ $(document).ready(function () {
             var lng = maker.position.lng();
             var fourUrl = "https://api.foursquare.com/v2/venues/explore?v=20161016&ll=" + lat + "," + lng + "&client_id=N3Y3RPYUKPGUJDV43KSVKKIWQGUPQHHK2WVPRM1YBYJPZFH4&client_secret=WJLN1QFWK0AG4GU125BNMLG0JOLBWW14JDDORYU5ZKB3DNXR&limit=4";
             $.getJSON(fourUrl, function (data) {
-                console.log(data.response.groups[0].items);
+                // get json data
             }).done(function (data) {
                 self.fourData(data.response.groups[0].items);
             }).fail(function () {
@@ -105,7 +114,7 @@ $(document).ready(function () {
         };
         //places services
         self.getDetails = function (marker) {
-            service = new google.maps.places.PlacesService(map);
+            var service = new google.maps.places.PlacesService(map);
             service.getDetails({
                 placeId: marker.id
             }, function (place, status) {
@@ -119,7 +128,7 @@ $(document).ready(function () {
                     } else {
                         self.urlTitle("No Link");
                     }
-                }else{
+                } else {
                     alert("Google API ERROR");
                 }
             });
@@ -128,17 +137,19 @@ $(document).ready(function () {
         self.setLocation = function (marker) {
             self.getDetails(marker);
             self.getFour(marker);
+            self.toggleBounce(marker);
             map.setCenter(marker.getPosition());
-            toggleBounce(marker);
         };
         // hide all markers
         self.hideMarkers = function (markers) {
             markers.forEach(function (marker) {
                 marker.setMap(null);
             });
-        }
+        };
         // generate new markers from search
         self.newPlaces = function () {
+            // init search term
+            var searchTeam = '';
             self.hideMarkers(self.placesMarkers());
             self.placesMarkers.removeAll();
             if (!self.autoAddress()) {
@@ -153,7 +164,15 @@ $(document).ready(function () {
                 createMakersForPlaces(results);
             });
         };
+        //toggle list
+        self.toggleList = function () {
+            $("#wrapper").toggleClass("toggled");
+        };
         self.newPlaces();
     }
     ko.applyBindings(new viewModel());
-});
+
+    function googleError() {
+        alert("Failed To Load Google API");
+    }
+}
