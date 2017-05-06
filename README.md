@@ -15,7 +15,7 @@ A web Application that uses the google MAPS API to allow the user to find places
 5. Makes use of the Foursquare API to list places of interest near the selected marker. (click on the `Near You` Button to display information)
 6. MAP rec centers to selected Marker.
 7. Toggle button to show / hide list of places.
-
+8. Text Search Box filter (Dynamically filters search results and updates UI to reflect changes)
 
 #### Application Dependencies
 

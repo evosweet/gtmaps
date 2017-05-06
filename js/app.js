@@ -15,6 +15,7 @@ function initMap() {
         self.placePhone = ko.observable("");
         self.placeWebsite = ko.observable("");
         self.urlTitle = ko.observable("");
+        self.filterKeyword = ko.observable();
         self.fourData = ko.observableArray([]);
         // custom map style
         var myStyles = [{
@@ -64,10 +65,7 @@ function initMap() {
                 });
                 // add click event to each marker
                 marker.addListener("click", function () {
-                    map.panTo(marker.getPosition());
-                    self.getDetails(this);
-                    self.toggleBounce(this);
-                    self.getFour(this);
+                    self.setLocation(this);
                 });
                 // add markers to array
                 self.placesMarkers.push(marker);
@@ -164,15 +162,34 @@ function initMap() {
                 createMakersForPlaces(results);
             });
         };
-        //toggle list
+        //computed filter 
+        self.filterPlaces = ko.computed(function () {
+            if (!self.filterKeyword()) {
+                return self.placesMarkers();
+            } else {
+                return ko.utils.arrayFilter(self.placesMarkers(), function (place) {
+                    return place.title.toLowerCase().indexOf(self.filterKeyword().toLowerCase()) !== -1;
+                });
+            }
+        });
+        // trigger filter on input change
+        self.filterKeyword.subscribe(function () {
+            self.placesMarkers().forEach(function (marker) {
+                marker.setVisible(false);
+            });
+            self.filterPlaces().forEach(function (marker) {
+                marker.setVisible(true);
+            });
+        });
+        //
         self.toggleList = function () {
             $("#wrapper").toggleClass("toggled");
         };
         self.newPlaces();
     }
     ko.applyBindings(new viewModel());
+}
 
-    function googleError() {
-        alert("Failed To Load Google API");
-    }
+function googleError() {
+    alert("Failed To Load Google API");
 }
